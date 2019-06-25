@@ -10,21 +10,43 @@ import UIKit
 
 class PokemonViewController: UIViewController {
 
+    @IBOutlet weak var pokemonSearchBar: UISearchBar!
+    @IBOutlet weak var pokemonSpriteImage: UIImageView!
+    @IBOutlet weak var pokemonNameLabel: UILabel!
+    @IBOutlet weak var pokemonIDLabel: UILabel!
+    @IBOutlet weak var pokemonAbilitiesLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        pokemonSearchBar.delegate = self
 
-        // Do any additional setup after loading the view.
+    }
+    func updatesView(with pokeball: TopLevelDictionary) {
+        DispatchQueue.main.async {
+            self.pokemonNameLabel.text = pokeball.name
+            self.pokemonAbilitiesLabel.text = pokeball.abilities[0].ability.name
+            self.pokemonIDLabel.text = "\(pokeball.id)"
+            
+        }
+
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+}
+extension PokemonViewController: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        PokemonController.sharedInstance.fetchPokemonWith(searchTerm: searchText) { (pokemon) in
+            guard let pokeball = pokemon else { return }
+            PokemonController.sharedInstance.fetchPokemonImage(pokemon: pokeball, completion: {
+                (image) in
+                DispatchQueue.main.async {
+                    self.pokemonSpriteImage.image = image
+                
+            }
+            self.updatesView(with: pokeball)
+        })
     }
-    */
-
+}
 }

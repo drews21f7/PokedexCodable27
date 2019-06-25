@@ -6,7 +6,7 @@
 //  Copyright © 2019 Drew Seeholzer. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class PokemonController {
     
@@ -44,4 +44,21 @@ class PokemonController {
             }
         }.resume()
     }
+    
+    func fetchPokemonImage(pokemon: TopLevelDictionary, completion: @escaping (UIImage?) -> Void) {
+        // Build URL
+        let imageURL = pokemon.spritesDictionary.image
+        
+        URLSession.shared.dataTask(with: imageURL) { (data, _, error) in
+            
+            if let error = error {
+                print("Error on image \(error.localizedDescription)")
+            }
+            if let data = data {
+                guard let pokemonImage = UIImage(data: data) else {completion(nil); return}
+                    completion(pokemonImage)
+            }
+        }.resume()
+    }
 }
+
